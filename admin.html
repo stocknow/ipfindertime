@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        /* Add your CSS styles for the admin page here */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        header {
+            background-color: #666;
+            color: #fff;
+            padding: 50px;
+        }
+        main {
+            padding: 40px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        #back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+    </header>
+
+    <main>
+        <h2>User List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>IP Address</th>
+                    <th>City</th>
+                    <th>Country</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+                <!-- User data will be dynamically added here -->
+            </tbody>
+        </table>
+    </main>
+
+    <button id="back-button">Back to Main Page</button>
+
+    <footer>
+        <p>&copy; IPtime</p>
+    </footer>
+
+    <script>
+        // Function to retrieve user data from localStorage
+        function getUsersFromStorage() {
+            return JSON.parse(localStorage.getItem('users')) || {};
+        }
+
+        // Function to fetch user data and display in the user list
+        function displayUserData() {
+            const userList = document.getElementById('user-list');
+            const usersData = getUsersFromStorage();
+
+            Object.entries(usersData).forEach(([username, password]) => {
+                fetchUserData(username, password);
+            });
+        }
+
+        // Function to fetch user data from external API
+        function fetchUserData(username, password) {
+            fetch('https://ipinfo.io/json')
+                .then(response => response.json())
+                .then(data => {
+                    const { ip, city, country } = data;
+                    displayUser(username, password, ip, city, country);
+                })
+                .catch(error => console.error('Error fetching IP data:', error));
+        }
+
+        // Function to display user data in the user list
+        function displayUser(username, password, ip, city, country) {
+            const userList = document.getElementById('user-list');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${username}</td>
+                <td>${password}</td>
+                <td>${ip}</td>
+                <td>${city}</td>
+                <td>${country}</td>
+            `;
+            userList.appendChild(row);
+        }
+
+        // Display user data when the admin page loads
+        displayUserData();
+
+        // Event listener for the Back button
+        document.getElementById('back-button').addEventListener('click', function () {
+            window.location.href = 'index.html'; // Redirect to the main page
+        });
+
+        // Prompt for password if not authenticated
+        window.onload = function() {
+            const password = prompt('Enter the admin password:');
+            if (password !== '211892A') {
+                alert('Incorrect password. Access denied.');
+                window.location.href = 'index.html'; // Redirect to the main page
+            }
+        };
+    </script>
+</body>
+</html>

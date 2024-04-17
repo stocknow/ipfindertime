@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Sign Up</title>
+    <style>
+        /* Add your CSS styles for the main page here */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        header {
+            background-color: #666;
+            color: #fff;
+            padding: 50px;
+        }
+        main {
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1></h1>
+    </header>
+
+    <main>
+        <!-- Login Section -->
+        <div id="login-section">
+            <h2>Login</h2>
+            <label for="login-username">Username:</label>
+            <input type="text" id="login-username" name="login-username" required><br><br>
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" name="login-password" required><br><br>
+            <button id="login-button">Log In</button>
+            <p id="login-error" style="color: red; display: none;">Incorrect username or password. Please try again.</p>
+            <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+        </div>
+
+        <!-- Sign-up Section (Initially Hidden) -->
+        <div id="signup-section" style="display: none;">
+            <h2>Sign Up</h2>
+            <label for="signup-username">Username:</label>
+            <input type="text" id="signup-username" name="signup-username" required><br><br>
+            <label for="signup-password">Password:</label>
+            <input type="password" id="signup-password" name="signup-password" required><br><br>
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" required><br><br>
+            <button id="signup-button">Sign Up</button>
+            <p id="signup-error" style="color: red; display: none;">Please enter a username and matching passwords.</p>
+            <p>Already have an account? <a href="#" id="show-login">Log in</a></p>
+        </div>
+
+        <!-- Dashboard Section (Hidden by Default) -->
+        <div id="dashboard-section" style="display: none;">
+            <h3 id="ip-title">IP Address</h3>
+            <p id="ip-address">Loading...</p>
+            <p id="city">City: Loading...</p>
+            <p id="country">Country: Loading...</p>
+            <button id="signout-button">Sign Out</button>
+            <button id="admin-button">Admin Panel</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; IPtime</p>
+    </footer>
+
+    <script>
+        // Function to retrieve user data from localStorage
+        function getUsersFromStorage() {
+            return JSON.parse(localStorage.getItem('users')) || {};
+        }
+
+        // Function to save user data to localStorage
+        function saveUserToStorage(user) {
+            const users = getUsersFromStorage();
+            users[user.username] = user.password;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Function to display a section and hide others
+        function showSection(sectionId) {
+            const sections = ['login-section', 'signup-section', 'dashboard-section'];
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (section === sectionId) {
+                    element.style.display = 'block';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        }
+
+        // Show the login section by default
+        showSection('login-section');
+
+        // Function to get the user's IP address, city, and country using ipinfo.io
+        function getIpInfo() {
+            return fetch('https://ipinfo.io/json')
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error:', error);
+                    return {
+                        ip: 'Error fetching IP',
+                        city: 'Error fetching city',
+                        country: 'Error fetching country'
+                    };
+                });
+        }
+
+        // Event listener for the Log In button
+        document.getElementById('login-button').addEventListener('click', function () {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const users = getUsersFromStorage();
+
+            // Check the password
+            if (users[username] && users[username] === password) {
+                showSection('dashboard-section');
+                getIpInfo().then(data => {
+                    document.getElementById('ip-title').textContent = 'IP Address';
+                    document.getElementById('ip-address').textContent = `Your IP: ${data.ip}`;
+                    document.getElementById('city').textContent = `City: ${data.city}`;
+                    document.getElementById('country').textContent = `Country: ${data.country}`;
+                });
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+
+        // Event listener for the Sign Up button
+        document.getElementById('signup-button').addEventListener('click', function () {
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (username && password && confirmPassword && password === confirmPassword) {
+                // Save user data to localStorage
+                saveUserToStorage({ username, password });
+                showSection('dashboard-section');
+                getIpInfo().then(data => {
+                    document.getElementById('ip-title').textContent = 'IP Address';
+                    document.getElementById('ip-address').textContent = `Your IP: ${data.ip}`;
+                    document.getElementById('city').textContent = `City: ${data.city}`;
+                    document.getElementById('country').textContent = `Country: ${data.country}`;
+                });
+            } else {
+                document.getElementById('signup-error').style.display = 'block';
+            }
+        });
+
+        // Event listener to show the login section
+        document.getElementById('show-login').addEventListener('click', function (e) {
+            e.preventDefault();
+            showSection('login-section');
+        });
+
+        // Event listener to show the sign-up section
+        document.getElementById('show-signup').addEventListener('click', function (e) {
+            e.preventDefault();
+            showSection('signup-section');
+        });
+
+        // Event listener for the Sign Out button
+        document.getElementById('signout-button').addEventListener('click', function () {
+            showSection('login-section'); // Redirect to the login section
+        });
+
+        // Event listener for the Admin Panel button
+        document.getElementById('admin-button').addEventListener('click', function () {
+            const password = prompt('Enter the admin password:');
+            if (password === '211892A') {
+                window.location.href = 'admin.html'; // Redirect to the admin page
+            } else {
+                alert('Incorrect password. Access denied.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Menu</title>
+    <style>
+        /* Add your CSS styles for the menu page here */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        header {
+            background-color: #666;
+            color: #fff;
+            padding: 50px;
+        }
+        main {
+            padding: 40px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Main Menu</h1>
+    </header>
+
+    <main>
+        <button id="login-button">Login</button>
+        <button id="signup-button">Sign Up</button>
+        <button id="admin-button">Admin Panel</button>
+    </main>
+
+    <footer>
+        <p>&copy; IPtime</p>
+    </footer>
+
+    <script>
+        // Event listener for the Login button
+        document.getElementById('login-button').addEventListener('click', function () {
+            window.location.href = 'index.html'; // Redirect to the login page
+        });
+
+        // Event listener for the Sign Up button
+        document.getElementById('signup-button').addEventListener('click', function () {
+            window.location.href = 'index.html'; // Redirect to the sign up page
+        });
+
+        // Event listener for the Admin Panel button
+        document.getElementById('admin-button').addEventListener('click', function () {
+            const password = prompt('Enter the admin password:');
+            if (password === '211892A') {
+                window.location.href = 'admin.html'; // Redirect to the admin page
+            } else {
+                alert('Incorrect password. Access denied.');
+            }
+        });
+    </script>
+</body>
+</html>
